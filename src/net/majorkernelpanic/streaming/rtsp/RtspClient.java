@@ -309,10 +309,12 @@ public class RtspClient {
 		mSocket = new Socket(mParameters.host, mParameters.port);
 		mBufferedReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
 		mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
+		sendRequestOption();
 		sendRequestAnnounce();
 		sendRequestSetup();
 		sendRequestRecord();
 	}
+	
 	
 	/**
 	 * Forges and sends the ANNOUNCE request 
@@ -325,7 +327,9 @@ public class RtspClient {
 				"Content-Length: " + body.length() + "\r\n" +
 				"Content-Type: application/sdp \r\n\r\n" +
 				body;
-		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+//		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		Log.i(TAG,request);
+
 
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
@@ -337,13 +341,13 @@ public class RtspClient {
 			Log.v(TAG,"RTSP server name unknown");
 		}
 
-		try {
-			Matcher m = Response.rexegSession.matcher(response.headers.get("session"));
-			m.find();
-			mSessionID = m.group(1);
-		} catch (Exception e) {
-			throw new IOException("Invalid response from server. Session id: "+mSessionID);
-		}
+//		try {
+//			Matcher m = Response.rexegSession.matcher(response.headers.get("session"));
+//			m.find();
+//			mSessionID = m.group(1);
+//		} catch (Exception e) {
+//			throw new IOException("Invalid response from server. Session id: "+mSessionID);
+//		}
 
 		if (response.status == 401) {
 			String nonce, realm;
@@ -401,7 +405,8 @@ public class RtspClient {
 						"Transport: RTP/AVP/"+params+"\r\n" +
 						addHeaders();
 
-				Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		//		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+				Log.i(TAG,request);
 
 				mOutputStream.write(request.getBytes("UTF-8"));
 				mOutputStream.flush();
@@ -431,7 +436,9 @@ public class RtspClient {
 		String request = "RECORD rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
 				"Range: npt=0.000-\r\n" +
 				addHeaders();
-		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+	//	Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		Log.i(TAG,request);
+		
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
 		Response.parseResponse(mBufferedReader);
@@ -442,7 +449,9 @@ public class RtspClient {
 	 */
 	private void sendRequestTeardown() throws IOException {
 		String request = "TEARDOWN rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" + addHeaders();
-		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+	//	Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		Log.i(TAG,request);
+		
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
 	}
@@ -452,7 +461,9 @@ public class RtspClient {
 	 */
 	private void sendRequestOption() throws IOException {
 		String request = "OPTIONS rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" + addHeaders();
-		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		//Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		Log.i(TAG,request);
+		
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
 		Response.parseResponse(mBufferedReader);
@@ -598,7 +609,8 @@ public class RtspClient {
 			}
 			if (line==null) throw new SocketException("Connection lost");
 
-			Log.d(TAG, "Response from server: "+response.status);
+		//	Log.d(TAG, "Response from server: "+response.status);
+			Log.e(TAG,response.headers.toString());
 
 			return response;
 		}
