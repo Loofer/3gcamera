@@ -309,7 +309,7 @@ public class RtspClient {
 		mSocket = new Socket(mParameters.host, mParameters.port);
 		mBufferedReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
 		mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
-		sendRequestOption();
+	//	sendRequestOption();
 		sendRequestAnnounce();
 		sendRequestSetup();
 		sendRequestRecord();
@@ -324,6 +324,7 @@ public class RtspClient {
 		String body = mParameters.session.getSessionDescription();
 		String request = "ANNOUNCE rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
 				"CSeq: " + (++mCSeq) + "\r\n" +
+				"User-Agent: 3G-Camera\r\n" +
 				"Content-Length: " + body.length() + "\r\n" +
 				"Content-Type: application/sdp \r\n\r\n" +
 				body;
@@ -367,24 +368,31 @@ public class RtspClient {
 			String hash1 = computeMd5Hash(mParameters.username+":"+m.group(1)+":"+mParameters.password);
 			String hash2 = computeMd5Hash("ANNOUNCE"+":"+uri);
 			String hash3 = computeMd5Hash(hash1+":"+m.group(2)+":"+hash2);
+			
+	//		String hash1 = computeMd5Hash(mParameters.username+":"+m.group(1)+":"+mParameters.password);
+//			String hash2 = computeMd5Hash("ANNOUNCE"+":"+uri);
+//			String hash3 = computeMd5Hash(mParameters.password+":"+m.group(2)+":"+hash2);
+
 
 			mAuthorization = "Digest username=\""+mParameters.username+"\",realm=\""+realm+"\",nonce=\""+nonce+"\",uri=\""+uri+"\",response=\""+hash3+"\"";
 
 			request = "ANNOUNCE rtsp://"+mParameters.host+":"+mParameters.port+mParameters.path+" RTSP/1.0\r\n" +
 					"CSeq: " + (++mCSeq) + "\r\n" +
+					"User-Agent: 3G-Camera\r\n" +
 					"Content-Length: " + body.length() + "\r\n" +
 					"Authorization: " + mAuthorization + "\r\n" +
 					"Session: " + mSessionID + "\r\n" +
 					"Content-Type: application/sdp \r\n\r\n" +
 					body;
 
-			Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+		//	Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
+			Log.i(TAG,request);
 
 			mOutputStream.write(request.getBytes("UTF-8"));
 			mOutputStream.flush();
 			response = Response.parseResponse(mBufferedReader);
 
-			if (response.status == 401) throw new RuntimeException("Bad credentials !");
+//			if (response.status == 401) throw new RuntimeException("Bad credentials !");
 
 		} else if (response.status == 403) {
 			throw new RuntimeException("Access forbidden !");
@@ -471,9 +479,10 @@ public class RtspClient {
 
 	private String addHeaders() {
 		return "CSeq: " + (++mCSeq) + "\r\n" +
-				"Content-Length: 0\r\n" +
+				"User-Agent: 3G-Camera\r\n" +
+				"Content-Length: 0\r\n"+
 				"Session: " + mSessionID + "\r\n" +
-				// For some reason you may have to remove last "\r\n" in the next line to make the RTSP client work with your wowza server :/
+			//	 For some reason you may have to remove last "\r\n" in the next line to make the RTSP client work with your wowza server :/
 				(mAuthorization != null ? "Authorization: " + mAuthorization + "\r\n":"") + "\r\n";
 	}
 
@@ -609,7 +618,7 @@ public class RtspClient {
 			}
 			if (line==null) throw new SocketException("Connection lost");
 
-		//	Log.d(TAG, "Response from server: "+response.status);
+			Log.d(TAG, "Response from server: "+response.status);
 			Log.e(TAG,response.headers.toString());
 
 			return response;

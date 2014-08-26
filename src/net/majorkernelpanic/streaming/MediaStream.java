@@ -309,10 +309,10 @@ public abstract class MediaStream implements Stream {
 
 		mReceiver = new LocalSocket();
 		mReceiver.connect( new LocalSocketAddress(LOCAL_ADDR+mSocketId));
-		mReceiver.setReceiveBufferSize(500000);
-		mReceiver.setSoTimeout(3000);
+		mReceiver.setReceiveBufferSize(500);
+		mReceiver.setSoTimeout(1000);
 		mSender = mLss.accept();
-		mSender.setSendBufferSize(500000);
+		mSender.setSendBufferSize(500);
 	}
 
 	protected void closeSockets() {
